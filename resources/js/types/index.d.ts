@@ -43,3 +43,19 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+// Extra toegevoegd
+interface LinkProps {
+  active: boolean;
+  label: string;
+  url: string | null;
+}
+
+interface PaginationProps {
+  links: LinkProps[];
+  current_page: number;
+  total: number;
+  from: number;
+  to: number;
+  per_page: string;
+}

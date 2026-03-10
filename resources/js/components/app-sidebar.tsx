@@ -23,7 +23,7 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Manage Products',
+        title: 'Beheer Producten',
         href: '/products',
         icon: ShoppingBag,
     },

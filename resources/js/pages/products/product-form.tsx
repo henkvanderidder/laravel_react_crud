@@ -9,7 +9,9 @@ import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
 import {ArrowLeft, LoaderCircle} from 'lucide-react';
 import * as React from "react";
-
+//import { create, show, edit, destroy } from "@/actions/App/Http/Controllers/ProductController";
+//import productController  from "@/actions/App/Http/Controllers/ProductController";
+import productRoutes from "@/routes/products";
 
 //export const Dashboard = () => {
 export default function ProductForm({...props}) {
@@ -20,10 +22,13 @@ export default function ProductForm({...props}) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `${isView ? 'Show' : isEdit ? 'Update' : 'Create'} Product`,
-            href: route('products.create'),
+            //href: route('products.create'),
+            //href: productController.create(),
+            href: productRoutes.create.url(),
         },
     ];
 
+    // voor post, zie de uitleg op https://inertiajs.com/docs/v2/the-basics/forms
     const { data, setData, post, processing, errors, reset } = useForm({
         name: product?.name || '',
         description: product?.description || '',
@@ -38,12 +43,14 @@ export default function ProductForm({...props}) {
         console.log('Form data:', data);
 
         if (isEdit) {
-            post(route('products.update', product.id), {
+            //post(route('products.update', product.id), {
+            post(productRoutes.update.url(product.id), {
                 forceFormData: true,
                 onSuccess: () => reset(),
             });
         } else {
-            post(route('products.store'), {
+            //post(route('products.store'), {
+            post(productRoutes.store.url(), {
                 onSuccess: () => reset(),
             });
         }
@@ -64,10 +71,10 @@ export default function ProductForm({...props}) {
               <div className="ml-auto">
                 <Link 
                   as='button'
-                  href={route('products.index')} 
+                  href={productRoutes.index.url()} 
                   className="flex items-center w-fit mb-4 rounded-lg bg-blue-600 px-4 py-2 text-white text-md cursor-pointer hover:opacity-90"
                 >
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Back to Products
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Terug
                 </Link>
               </div>
               <Card>

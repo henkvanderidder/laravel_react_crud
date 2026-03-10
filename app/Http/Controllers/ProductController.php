@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Http\Requests\ProductFormRequest;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Exception;
 use Inertia\Inertia;
@@ -14,10 +15,11 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
         //dd('Product Index');
+        /* Alles
         $products = Product::latest()->get()->map(fn($product) => [
             'id' => $product->id,
             'name' => $product->name,
@@ -29,6 +31,55 @@ class ProductController extends Controller
         return Inertia::render('products/index' , [
             'products' => $products,
         ]);
+        */
+        //dump($request-> all());
+        $products = Product::query();
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $products->where(fn($query) => 
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('price', 'like', "%{$search}%")
+            );
+        }
+
+        $perPage = (int) ($request->perPage ?? 5);
+        if ($perPage === -1) {
+            $products = $products->latest()->get()->map(fn($product) => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'featured_image' => $product->featured_image ? asset('storage/' . $product->featured_image) : null,
+                'created_at' => $product->created_at->format('d-m-Y'),
+            ]);
+            $productsPage = [
+                'data' => $products,
+                'total' => $products->count(),
+                'per_page' => $perPage,
+                'from' => 1,
+                'to' => $products->count(),
+                'links' => [],
+            ];
+        } else {
+            $productsPage = $products->latest()->paginate($perPage)->withQueryString();
+            $productsPage->getCollection()->transform(fn($product) => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'featured_image' => $product->featured_image ? asset('storage/' . $product->featured_image) : null,
+                'created_at' => $product->created_at->format('d-m-Y'),
+            ]);
+        }
+
+
+
+        return Inertia::render('products/index' , [
+            'productsPage' => $productsPage,
+            'filters' => $request->only(['search', 'perPage']),
+        ]);
+
     }
 
     /**
@@ -98,7 +149,7 @@ class ProductController extends Controller
         return Inertia::render('products/product-form', [
             'product' => $product,
             'isView' => true,
-        ]);
+       ]);
     }
 
     /**
@@ -156,6 +207,9 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         //
+        // dd($product);
+        // return redirect()->back()->with('error', 'Unable to delete product. Please try again!');
+
         try {
             if ($product) {
                 $product->delete();

@@ -109,7 +109,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                             className="h-5 w-5"
                                                         />
                                                     )}
-                                                    <span>{item.title}</span>
+                                                    <span>titel{item.title}</span>
                                                 </Link>
                                             ))}
                                         </div>
