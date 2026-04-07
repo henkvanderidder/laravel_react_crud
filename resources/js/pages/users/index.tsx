@@ -8,55 +8,45 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { Pagination } from '@/components/ui/pagination';
 //import { create, show, edit, destroy } from "@/actions/App/Http/Controllers/ProductController";
-import productsController from "@/actions/App/Http/Controllers/ProductController";
+import usersController from "@/actions/App/Http/Controllers/UserController";
 import { Input } from '@headlessui/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Manage Products',
-        href: '/products',
+        title: 'Manage Users',
+        href: '/users',
     },
 ];
 
-interface Product {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-    featured_image: string;
-    featured_image_original_name: string;
-    created_at: string;
+interface UserPagination extends PaginationProps {
+  data: User[];
 }
 
-interface ProductPagination extends PaginationProps {
-  data: Product[];
-}
 interface FilterProps {
   search: string;
   perPage: string;
 }
 
 interface IndexProps {
-  productsPage: ProductPagination;
+  usersPage: UserPagination;
   auth: Auth;
   filters: FilterProps;
 }
 
-//export const Dashboard = () => {
-//export default function Index({...props} : { products: Product[] }) {
+
 export default function Index({ ...props}: IndexProps ) {
 
        //const { products } = props;
     console.log('Props:', props);
 
-    const  { auth, productsPage, filters} = props;
+    const  { auth, usersPage, filters} = props;
 
-    const user = auth.user as User;
+    const loginUser = auth.user as User;
 
-    console.log('auth.email',auth.user.email);
-    console.log('user.name',user.name);
+    //console.log('auth.email',auth.user.email);
+    console.log('loginUser.name',loginUser.name);
 
-    const products = productsPage.data;
+    const users = usersPage.data;
 
     const { flash } = usePage<{ flash?: { success?: string; error?: string } }>().props;
     const flashMessage = flash?.success || flash?.error;
@@ -77,7 +67,7 @@ export default function Index({ ...props}: IndexProps ) {
         if (confirm('Are you sure, you want to delete?')) {
           //destroy(id);
           //setShowAlert(true);
-          router.delete(productsController.destroy(id), {
+          router.delete(usersController.destroy(id), {
               preserveState: true,
               preserveScroll: true,
           });
@@ -100,7 +90,7 @@ export default function Index({ ...props}: IndexProps ) {
 
       //const queryString = value ? {search: value} : {};
 
-      router.get(productsController.index(), queryString , {
+      router.get(usersController.index(), queryString , {
         preserveState: true,
         preserveScroll: true,
       })
@@ -114,7 +104,7 @@ export default function Index({ ...props}: IndexProps ) {
         ...(data.perPage && { perPage: data.perPage}),
       }
 
-      router.get(productsController.index(), queryString , {
+      router.get(usersController.index(), queryString , {
         preserveState: true,
         preserveScroll: true,
       })
@@ -129,7 +119,7 @@ export default function Index({ ...props}: IndexProps ) {
         ...(value && { perPage: value}),
       }
 
-      router.get(productsController.index(), queryString , {
+      router.get(usersController.index(), queryString , {
         preserveState: true,
         preserveScroll: true,
       })
@@ -156,7 +146,7 @@ export default function Index({ ...props}: IndexProps ) {
                     type='text'
                     value={data.search}
                     onChange={handleSearch}
-                    placeholder='Zoek product...'
+                    placeholder='Zoek gebruiker...'
                     name='search'
                     className='h-10 w-1/3 border rounded'
                 />
@@ -172,9 +162,9 @@ export default function Index({ ...props}: IndexProps ) {
 
                   <Link className="flex items-center mb-4 rounded-lg bg-blue-600 px-4 py-2 text-white text-md cursor-pointer hover:opacity-90"
                         as='button' 
-                        href={productsController.create()}
+                        href={usersController.create()}
                   >
-                  <CirclePlusIcon className="mr-2 h-4 w-4" /> Voeg nieuw product toe
+                  <CirclePlusIcon className="mr-2 h-4 w-4" /> Voeg nieuwe gebruiker toe
                   </Link>
                 </div>
               </div>
@@ -185,43 +175,41 @@ export default function Index({ ...props}: IndexProps ) {
                     <tr className='bg-black/10'>
                       <th className="border border-gray-300 px-4 py-2">#</th>
                       <th className="border border-gray-300 px-4 py-2">Naam</th>
-                      <th className="border border-gray-300 px-4 py-2">Omschrijving</th>
-                      <th className="border border-gray-300 px-4 py-2">Prijs</th>
-                      <th className="border border-gray-300 px-4 py-2">Afbeelding</th>
+                      <th className="border border-gray-300 px-4 py-2">Email</th>
+                      <th className="border border-gray-300 px-4 py-2">Avatar</th>
                       <th className="border border-gray-300 px-4 py-2">Aanmaakdatum</th>
                       <th className="border border-gray-300 px-4 py-2">Acties</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Render product rows here */}
-                    {products.length === 0 ? (
+                    {/* Render user rows here */}
+                    {users.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-2 text-center border">Geen producten gevonden.</td>
+                        <td colSpan={7} className="px-4 py-2 text-center border">Geen gebruikers gevonden.</td>
                       </tr>
                     ) : (
-                      products.map((product, index) => (
+                      users.map((user, index) => (
                       <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}>
-                        <td className='px-4 py-2 text-center border'>{productsPage.from + index}</td>
-                        <td className='px-4 py-2 text-center border'>{product.name}</td>
-                        <td className='px-4 py-2 text-center border'>{product.description}</td>
-                        <td className='px-4 py-2 text-center border'>€{product.price}</td>
+                        <td className='px-4 py-2 text-center border'>{usersPage.from + index}</td>
+                        <td className='px-4 py-2 text-center border'>{user.name}</td>
+                        <td className='px-4 py-2 text-center border'>{user.email}</td>
                         <td className='px-4 py-2 text-center border'>
-                          {product.featured_image && (
-                            <img src={product.featured_image} alt={product.name} className="w-16 h-16 object-cover mx-auto" />
+                          {user.avatar && (
+                            <img src={user.avatar} alt={user.name} className="w-16 h-16 object-cover mx-auto" />
                           )}
                         </td>
-                        <td className='px-4 py-2 text-center border'>{product.created_at}</td>
+                        <td className='px-4 py-2 text-center border'>{user.created_at}</td>
                         <td className='px-4 py-2 text-center border'>
                           <Link 
                             as='button'
-                            href={productsController.show(product.id)}
+                            href={usersController.show(user.id)}
                             className='ms-2 cursor-pointer bg-green-600 text-white p-2 rounded-lg hover:opacity-90'
                           >
                             <Eye size={16} />{' '}
                           </Link>
                           <Link 
                             as='button'
-                            href={productsController.edit(product.id)}
+                            href={usersController.edit(user.id)}
                             className='ms-2 cursor-pointer bg-blue-600 text-white p-2 rounded-lg hover:opacity-90'
                           >
                             <Pencil size={16} />{' '}
@@ -229,8 +217,8 @@ export default function Index({ ...props}: IndexProps ) {
                           <Button 
                             
                             onClick={() => {
-                              // handleDelete(product.id, destroy(product.id));
-                              handleDelete(product.id);
+                              // handleDelete(user.id, destroy(user.id));
+                              handleDelete(user.id);
                             }}
                             className='h-8 w-9 ms-2 cursor-pointer bg-red-600 text-white p-2 rounded-lg hover:opacity-90'
                           >
@@ -246,7 +234,7 @@ export default function Index({ ...props}: IndexProps ) {
               </div>
               {/* Pagination */}
               <Pagination 
-                page={productsPage} 
+                page={usersPage} 
                 perPage={data.perPage}
                 onPerPageChange={handlePerPageChange}
               />
