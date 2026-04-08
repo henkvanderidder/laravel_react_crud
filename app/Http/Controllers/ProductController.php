@@ -83,6 +83,27 @@ class ProductController extends Controller
     }
 
     /**
+     * Display a 'bare' listing of the resource.
+     */
+    public function list_all(Request $request)
+    {
+
+        $products = Product::latest()->get()->map(fn($product) => [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'price' => $product->price,
+            'featured_image' => $product->featured_image ? asset('storage/' . $product->featured_image) : null,
+            'created_at' => $product->created_at->format('d-m-Y'),
+        ]);
+        
+        return Inertia::render('products/list' , [
+            'products' => $products,
+        ]);
+        
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
