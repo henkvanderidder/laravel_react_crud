@@ -90,7 +90,7 @@ class ProductController extends Controller
 
         $products = Product::latest()->get()->map(fn($product) => [
             'id' => $product->id,
-            'name' => $product->name,
+            'name' => strtolower($product->name),
             'description' => $product->description,
             'price' => $product->price,
             'featured_image' => $product->featured_image ? asset('storage/' . $product->featured_image) : null,
